@@ -1,0 +1,65 @@
+---
+- name: System Backup Deployment
+  hosts: all
+  become: yes
+
+
+  vars:
+    mysql_root_password: StrongRootPass123
+    admin_email: admin@example.com
+
+  tasks:
+
+  - name: Install packages
+    apt:
+      name:
+        - mariadb-server
+        - msmtp
+        - msmtp-mta
+        - smartmontools
+        - mailutils
+      state: present
+      update_cache: yes
+
+
+  - name: Configure msmtp
+    copy:
+      dest: /etc/msmtprc
+      mode: '0600'
+      content: |
+        defaults
+        auth on
+        tls on
+        tls_trust_file /etc/ssl/certs/ca-certificates.crt
+        account default
+        host smtp.gmail.com
+        port 587
+        from {{ admin_email }}
+        user {{ admin_email }}
+        password your_app_password
+
+
+  - name: Install backup script
+    copy:
+      src: system-backup.sh
+      dest: /usr/local/bin/system-backup.sh
+      mode: '0755'
+
+
+  - name: Install service
+    copy:
+      src: system-backup.service
+      dest: /etc/systemd/system/system-backup.service
+
+
+  - name: Install timer
+    copy:
+      src: system-backup.timer
+      dest: /etc/systemd/system/system-backup.timer
+
+  - name: Enable timer
+    systemd:
+      name: system-backup.timer
+      enabled: yes
+      state: started
+      daemon_reload: yes

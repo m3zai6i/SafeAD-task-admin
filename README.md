@@ -33,6 +33,19 @@ The following assignment requirements were implemented:
 
 ---
 
+# Automated Linux Backup System (Summary)
+
+A production-style backup automation project using:
+
+- Bash scripting
+- systemd timers
+- MariaDB
+- Ansible
+- SMART disk monitoring
+- Email alerts
+
+---
+
 # Project Structure
 
 ```
